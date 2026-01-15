@@ -12,7 +12,7 @@
         if (!$title || !$price || !$category || !$avatar['name']) {
             $_SESSION['add_item'] = "Fill in all inputs!";
         } else {
-            // work on image
+            // work on image on this
             $avatar_name = $avatar['name'];
             $avatar_tmp_name = $avatar['tmp_name'];
             $avatar_destination = "../images/items/" . $avatar_name;
