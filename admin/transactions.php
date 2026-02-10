@@ -1,7 +1,7 @@
     <?php
         include "./configuration/database.php";
         include "./partials/header.php";
-        $select_items = "SELECT * FROM transaction_log ORDER BY created_at DESC";
+        $select_items = "SELECT * FROM activity ORDER BY id DESC";
         $query_items = mysqli_query($connection, $select_items);
     ?>
         <div id="btn" class="open" onclick="openSide()">
@@ -20,7 +20,7 @@
             <a href="manage_items.php">Manage Items</a>
             <a href="manage_carts.php">Manage Carts</a>
             <a href="customers.php">View Customers</a>
-            <a href="transactions.php" class="active">Transactions</a>
+            <a href="transactions.php" class="active">Activities</a>
             <a href="order.php">View Orders</a>
             <?php endif ?>
             <a href="histroy.php">Order History</a>
@@ -31,18 +31,16 @@
             <table>
                 <tr>
                     <th>ID</th>
-                    <th>Customer ID</th>
-                    <th>Transactions</th>
+                    <th>Activity caught</th>
                     <th>IP address</th>
                     <th>Time</th>
                 </tr>
                 <?php while ($item = mysqli_fetch_assoc($query_items)) : ?>
                 <tr>
-                    <td><?= $item['id'] ?></td>
-                    <td><?= $item['user_id'] ?></td>
-                    <td><?= $item['actions_logged'] ?></td>
-                    <td><?= $item['ip_address'] ?></td>
-                    <td><?= $item['created_at'] ?></td>
+                    <td><?= htmlspecialchars($item['id'], ENT_QUOTES, 'UTF-8') ?></td>
+                    <td><?= htmlspecialchars($item['activity_status'], ENT_QUOTES, 'UTF-8') ?></td>
+                    <td><?= htmlspecialchars($item['ip_address'], ENT_QUOTES, 'UTF-8') ?></td>
+                    <td><?= date('Y-m-d H:i', strtotime(htmlspecialchars($item['date'], ENT_QUOTES, 'UTF-8'))) ?></td>
                 </tr>
                 <?php endwhile ?>
             </table>

@@ -66,7 +66,7 @@
             <a href="manage_items.php">Manage Items</a>
             <a href="manage_carts.php">Manage Carts</a>
             <a href="customers.php">View Customers</a>
-            <a href="transactions.php">Transactions</a>
+            <a href="transactions.php">Activities</a>
             <a href="order.php">View Orders</a>
             <?php endif ?>
             <a href="histroy.php">Order History</a>

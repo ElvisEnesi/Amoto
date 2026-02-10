@@ -14,14 +14,32 @@
         $result = mysqli_query($connection, $edit_search);
         $edit = mysqli_fetch_assoc($result);
     }
-    // check transaction errors
+    // ip address function
+    function get_ip_address() {
+        // declare ip_address
+        $ip_address = '';
+        // check various headers for potential ip address
+        if (isset($_SERVER['HTTP_CLIENT_IP'])) {
+                $ip_address = $_SERVER['HTTP_CLIENT_IP'];
+            } elseif (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+                $ip_address = $_SERVER['HTTP_X_FORWARDED_FOR'];
+            }  elseif (isset($_SERVER['REMOTE_ADDR'])) {
+                $ip_address = $_SERVER['REMOTE_ADDR'];
+            } else {
+                $ip_address = 'UNKNOWN';
+            }
+            return $ip_address;
+        }
+    // ip address
+    $user_ip = get_ip_address();
+    // check transaction errors/
     $transaction_select = "SELECT COUNT(*) AS failed_count FROM transaction_log 
     WHERE user_id = $current_payment AND actions_logged = 'payment_failed' AND created_at >= NOW() - INTERVAL 10 MINUTE";
     $transaction_query = mysqli_query($connection, $transaction_select);
     $transaction = mysqli_fetch_assoc($transaction_query);
     // check bot behaviours
     $bot_select = "SELECT COUNT(*) AS attempt FROM transaction_log 
-    WHERE user_id = $current_payment AND actions_logged = 'payment_attempt' AND created_at >= NOW() - INTERVAL 30 SECOND";
+    WHERE user_id = $current_payment AND actions_logged = 'payment_attempt' AND created_at >= NOW() - INTERVAL 5 MINUTE";
     $bot_query = mysqli_query($connection, $bot_select);
     $bot = mysqli_fetch_assoc($bot_query);
 ?>
@@ -46,11 +64,15 @@
         9063789267 OPAY campus shop, Payment validates order!!   send receipt picture below!!
     </div>
     <?php
-        $join = "SELECT SUM(p.price * c.quantity) AS total_price FROM cart c JOIN products p ON c.product_id = p.id WHERE c.status = 'active' AND c.customer_id =$current_payment";
-        $join_query= mysqli_query($connection, $join);
-        $total_price = 0;
-        if ($join_query && $gotten = mysqli_fetch_assoc($join_query)) {
-            $total_price = $gotten['total_price'] ?? 0;
+        $join = "SELECT p.id AS product_id, p.price AS price, c.quantity AS quantity, c.product_id AS cart_product_id FROM cart c 
+        INNER JOIN products p ON c.product_id = p.id WHERE c.status = ? AND c.customer_id = ?";
+        $join_query= mysqli_prepare($connection, $join);
+        $status = "active";
+        mysqli_stmt_bind_param($join_query, "si", $status, $current_payment);
+        mysqli_stmt_execute($join_query);
+        $join_result = mysqli_stmt_get_result($join_query);
+        if ($join_query && $gotten = mysqli_fetch_assoc($join_result)) {
+            $total_price = $gotten['price'] * $gotten['quantity'];
         }
         // select product details
         $product_id = $edit['product_id'];
@@ -60,6 +82,10 @@
     ?>
     <?php if ($transaction['failed_count'] >= 5 || $bot['attempt'] >= 3): ?>
         <?php
+            $activity = mysqli_prepare($connection, "INSERT INTO activity (activity_status, ip_address) VALUES (?, ?)");
+            $status = "Fraud transaction!!";
+            mysqli_stmt_bind_param($activity, "ss", $status, $user_ip);
+            mysqli_stmt_execute($activity);
             $_SESSION['transaction'] = "Too many failed transaction, try again after 15minutes!!";
             header("location: " .root_url . "admin/cart.php");
             die();
