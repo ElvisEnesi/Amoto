@@ -2,7 +2,7 @@
     // including files
     include "./configuration/constant.php";
     include "./configuration/database.php";
-    // not logged i
+    // not logged in
     if (isset($_POST['login'])) {
         header("location: " . root_url . "login.php");
         die();
@@ -10,12 +10,18 @@
     // logged in
     if (isset($_POST['submit'])) {
         // declare variables
-        $customer_id = (int) $_POST['customer'];
-        $product_id = (int) $_POST['id'];
+        $customer_id = (int) $_SESSION['user_id'] ?? null;
         $quantity = (int) $_POST['qty'];
+        // get product id from url
+        if (isset($_GET['id'])) {
+            $product_id = (int) $_GET['id'];
+        } else {
+            header("location: " . root_url . "admin/single.php");
+            die();
+        }
         // validate inputs
-        if (!is_numeric($quantity)) {
-            $_SESSION['single_logic'] = "Quantity must be a number!!";
+        if (!is_numeric($quantity) || !is_numeric($product_id) || !is_numeric($customer_id)) {
+            $_SESSION['single_logic'] = "All fields must be numbers!!";
         } elseif ($quantity < 1) {
             $_SESSION['single_logic'] = "Quantity can't be less than 1!!";
         }
@@ -27,7 +33,7 @@
            // insert into cart
            $insert = "INSERT INTO cart SET customer_id=?, product_id=?, quantity=?";
            $stmt = mysqli_prepare($connection, $insert);
-           mysqli_stmt_bind_param($stmt, "iiii", $customer_id, $product_id, $quantity);
+           mysqli_stmt_bind_param($stmt, "iii", $customer_id, $product_id, $quantity);
            $query = mysqli_stmt_execute($stmt);
            if (!mysqli_errno($connection)) {
                 $_SESSION['success'] = "Item successfully added to cart!!";

@@ -32,9 +32,7 @@
             <div class="cart_info">
                 <h3><?= htmlspecialchars($product['product'], ENT_QUOTES, 'UTF-8') ?></h3>
                 <p>$<?= htmlspecialchars($product['price'], ENT_QUOTES, 'UTF-8') ?></p>
-                <form action="admin/single_logic.php" method="post">
-                    <input type="hidden" name="customer" value="<?= $_SESSION['user_id'] ?? null ?>">
-                    <input type="hidden" name="id" value="<?= htmlspecialchars($product['id'], ENT_QUOTES, 'UTF-8') ?>">
+                <form action="admin/single_logic.php?id=<?= htmlspecialchars($product['id'], ENT_QUOTES, 'UTF-8') ?>" method="post">
                     <label for="qty">Quantity</label>
                     <input type="number" name="qty" min="1">
                     <br><br>
