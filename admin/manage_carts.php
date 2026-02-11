@@ -1,6 +1,8 @@
     <?php
         // include database connection
         include "./configuration/database.php";
+        // include header
+        include "./partials/header.php";
         // ip address function
         function get_ip_address() {
             // declare ip_address
@@ -28,8 +30,6 @@
             // redirect
             header("location: " . root_url . "kick_you_out.php");
         }
-        // include header
-        include "./partials/header.php";
         // select carts to display
         $select_cart = "SELECT * FROM cart WHERE status=? ORDER BY id DESC";
         $stmt_cart = mysqli_prepare($connection, $select_cart);

@@ -25,6 +25,15 @@
         }
         // ip address
         $user_ip = get_ip_address();
+        // check if user is flagged as unauthorized
+        $check_unauthorized = mysqli_prepare($connection, "SELECT * FROM unauthorized WHERE ip_address=?");
+        mysqli_stmt_bind_param($check_unauthorized, "s", $user_ip);
+        mysqli_stmt_execute($check_unauthorized);
+        $result_unauthorized = mysqli_stmt_get_result($check_unauthorized);
+        if (mysqli_num_rows($result_unauthorized) > 0) {
+            header("location: " . root_url . "kicked.php");
+            die();
+        }
         // VALIDATE
         if (!$user_name || !$key) {
             $_SESSION['login'] = "Fill in all spaces!!";
