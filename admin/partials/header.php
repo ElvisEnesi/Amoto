@@ -6,18 +6,18 @@
         header("location: " . root_url . "login.php");
         die();
     }
-        // select user details
-        $current_user = $_SESSION['user_id'];
-        $select = "SELECT * FROM user WHERE id=$current_user";
-        $result = mysqli_query($connection, $select);
-        $user = mysqli_fetch_assoc($result);
-        // count carts
-        $count_cart = "SELECT COUNT(*) AS total_cart FROM cart WHERE status = 'active' AND customer_id=$current_user";
-        $result_cart = mysqli_query($connection, $count_cart);
-        $total_active_carts = 0;
-        if ($result_cart && $row = mysqli_fetch_assoc($result_cart)) {
-            $total_active_carts = $row['total_cart'];
-        }
+    // select user details
+    $current_user = $_SESSION['user_id'];
+    $select = "SELECT * FROM user WHERE id=$current_user";
+    $result = mysqli_query($connection, $select);
+    $user = mysqli_fetch_assoc($result);
+    // count carts
+    $count_cart = "SELECT COUNT(*) AS total_cart FROM cart WHERE status = 'active' AND customer_id=$current_user";
+    $result_cart = mysqli_query($connection, $count_cart);
+    $total_active_carts = 0;
+    if ($result_cart && $row = mysqli_fetch_assoc($result_cart)) {
+        $total_active_carts = $row['total_cart'];
+    }
 ?>
 <!DOCTYPE html>
 <html lang="en">

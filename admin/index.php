@@ -1,7 +1,7 @@
     <?php
         include "./configuration/database.php";
         include "./partials/header.php";
-        include "../partials/nav.php";//
+        include "../partials/nav.php";
     ?>
     <?php if (htmlspecialchars($user['fraud_status'], ENT_QUOTES, 'UTF-8') === 'flagged') : ?>
     <div class="notice">

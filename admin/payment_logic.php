@@ -3,20 +3,37 @@
     include "./configuration/database.php";
     // current user
     $current_payment = $_SESSION['user_id'] ?? null;
-    // get id from url
-    if (isset($_GET['id'])) {
-        $id = (int) $_GET['id'];
-        $edit_search = "SELECT * FROM cart WHERE id = ?";
-        $edit_query = mysqli_prepare($connection, $edit_search);
-        mysqli_stmt_bind_param($edit_query, "i", $id);
-        mysqli_stmt_execute($edit_query);
-        $result = mysqli_stmt_get_result($edit_query);
-        $edit = mysqli_fetch_assoc($result);
-    } else {
-        header("location: " . root_url . "admin/cart.php");
-        die();
+    // ip address function
+    function get_ip_address() {
+        // declare ip_address
+        $ip_address = '';
+        // check various headers for potential ip address
+        if (isset($_SERVER['HTTP_CLIENT_IP'])) {
+            $ip_address = $_SERVER['HTTP_CLIENT_IP'];
+        } elseif (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            $ip_address = $_SERVER['HTTP_X_FORWARDED_FOR'];
+        }  elseif (isset($_SERVER['REMOTE_ADDR'])) {
+            $ip_address = $_SERVER['REMOTE_ADDR'];
+        } else {
+            $ip_address = 'UNKNOWN';
+        }
+        return $ip_address;
     }
-    $join = "SELECT p.id AS product_id, p.product AS title, p.price AS price, c.quantity AS quantity, c.product_id AS cart_product_id FROM cart c 
+    // ip address
+    $user_ip = get_ip_address();
+    // get id from url
+    if (isset($_GET['id']) && isset($_SESSION['user_id']) && isset($_SESSION['i_am_admin'])) {
+        $id = (int) $_GET['id'];
+    } else {
+        // insert into unauthorized
+        $unauthorized = mysqli_prepare($connection, "INSERT INTO unauthorized (ip_address) VALUES(?)");
+        mysqli_stmt_bind_param($unauthorized, "s", $user_ip);
+        mysqli_stmt_execute($unauthorized);
+        // redirect
+        header("location: " . root_url . "kick_you_out.php");
+    }
+    // join tables
+    $join = "SELECT p.id AS product_id, p.product AS title, p.price AS price, c.id AS cart_id c.quantity AS quantity, c.product_id AS cart_product_id FROM cart c 
     INNER JOIN products p ON c.product_id = p.id WHERE c.status = ? AND c.customer_id = ?";
     $join_query= mysqli_prepare($connection, $join);
     $status = "active";
@@ -28,31 +45,13 @@
     // payment logic
     if (isset($_POST['submit'])) {
         // declare variables
-        $cart_id = (int) $edit['id'];
+        $cart_id = (int) $gotten['cart_id'];
         $product_id = (int) $gotten['product_id'];
         $product_name = (string) $gotten['title'];
         $quantity = (int) $gotten['quantity'];
         $total_price = (int) $gotten['price'] * (int) $gotten['quantity'];
         $avatar = $_FILES['avatar'];
         $customer_id = $_SESSION['user_id'];
-        // ip address function
-        function get_ip_address() {
-            // declare ip_address
-            $ip_address = '';
-            // check various headers for potential ip address
-            if (isset($_SERVER['HTTP_CLIENT_IP'])) {
-                $ip_address = $_SERVER['HTTP_CLIENT_IP'];
-            } elseif (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-                $ip_address = $_SERVER['HTTP_X_FORWARDED_FOR'];
-            }  elseif (isset($_SERVER['REMOTE_ADDR'])) {
-                $ip_address = $_SERVER['REMOTE_ADDR'];
-            } else {
-                $ip_address = 'UNKNOWN';
-            }
-            return $ip_address;
-        }
-        // ip address
-        $user_ip = get_ip_address();
         // log payment attempt
         $error =mysqli_prepare($connection, "INSERT INTO transaction_log (user_id, ip_address) VALUES (?, ?)");
         mysqli_stmt_bind_param($error, "is", $customer_id, $user_ip);
@@ -111,13 +110,12 @@
                 // move uploaded file
                 move_uploaded_file($avatar_tmp_name, $avatar_destination);
                 $_SESSION['success'] = "Payment made, check your history!!";
-                header("location: " . root_url . "admin/cart.php");
-                die();
             } else {
                 $_SESSION['error'] = "Couldn't make payment";
-                header("location: " . root_url . "admin/cart.php");
-                die();
             }
+            // redirect
+            header("location: " . root_url . "admin/cart.php");
+            die();
         }
     } else {
         header("location: " . root_url . "admin/payment.php");
