@@ -650,6 +650,7 @@ h2::before {
     padding: 10px;
     margin-bottom: 5px;
     background-color: rgb(235, 230, 230);
+    vertical-align: middle;
 }
 .dashbord main table tr th {
     font-size: 20px;

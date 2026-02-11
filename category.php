@@ -3,28 +3,34 @@
         include "./configuration/database.php";
         include "./partials/header.php";
         if (isset($_GET['id'])) {
-            $id = filter_var($_GET['id'], FILTER_SANITIZE_NUMBER_INT);
-            $select_products = "SELECT * FROM products WHERE category_id = $id";
-            $query_products = mysqli_query($connection, $select_products);
+            $id = (int)$_GET['id'];
+            $select_products = "SELECT * FROM products WHERE category_id = ?";
+            $stmt = mysqli_prepare($connection, $select_products);
+            mysqli_stmt_bind_param($stmt, "i", $id);
+            mysqli_stmt_execute($stmt);
+            $query_products = mysqli_stmt_get_result($stmt);
         }
     ?>
     <?php
         $category_id = $id;
-        $search_category = "SELECT * FROM category WHERE id=$category_id";
-        $query_category = mysqli_query($connection, $search_category);
+        $search_category = "SELECT * FROM category WHERE id=?";
+        $stmt_category = mysqli_prepare($connection, $search_category);
+        mysqli_stmt_bind_param($stmt_category, "i", $category_id);
+        mysqli_stmt_execute($stmt_category);
+        $query_category = mysqli_stmt_get_result($stmt_category);
         $category = mysqli_fetch_assoc($query_category);
     ?>
-    <h2><?= $category['title'] ?></h2>
+    <h2><?= htmlspecialchars($category['title'], ENT_QUOTES, 'UTF-8') ?></h2>
     <?php if (mysqli_num_rows($query_products) > 0) : ?>
     <section class="container">
         <?php while ($product = mysqli_fetch_assoc($query_products)) : ?>
         <div class="card">
             <div class="card_img">
-                <img src="./images/items/<?= $product['picture'] ?>" onclick="window.location.href='single.php?id=<?= $product['id'] ?>'">
+                <img src="./images/items/<?= htmlspecialchars($product['picture'], ENT_QUOTES, 'UTF-8') ?>" onclick="window.location.href='single.php?id=<?= htmlspecialchars($product['id'], ENT_QUOTES, 'UTF-8') ?>'">
                 <div class="card_featured">Best seller</div>
             </div>
-            <p><?= $product['product'] ?></p>
-            <span class="price">$<?= $product['price'] ?></span>
+            <p><?= htmlspecialchars($product['product'], ENT_QUOTES, 'UTF-8') ?></p>
+            <span class="price">$<?= htmlspecialchars($product['price'], ENT_QUOTES, 'UTF-8') ?></span>
         </div>
         <?php endwhile ?>
     </section>

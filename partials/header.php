@@ -29,19 +29,26 @@
             <?php
                 // select user details
                 $current_user = $_SESSION['user_id'];
-                $select = "SELECT * FROM user WHERE id=$current_user";
-                $result = mysqli_query($connection, $select);
+                $select = "SELECT * FROM user WHERE id=?";
+                $stmt = mysqli_prepare($connection, $select);
+                mysqli_stmt_bind_param($stmt, "i", $current_user);
+                mysqli_stmt_execute($stmt);
+                $result = mysqli_stmt_get_result($stmt);
                 $user = mysqli_fetch_assoc($result);
             // count carts
-            $count_cart = "SELECT COUNT(*) AS total_cart FROM cart WHERE status = 'active' AND customer_id=$current_user";
-            $result_cart = mysqli_query($connection, $count_cart);
+            $count_cart = "SELECT COUNT(*) AS total_cart FROM cart WHERE status = ? AND customer_id=?";
+            $stmt_cart = mysqli_prepare($connection, $count_cart);
+            $head_status = "active";
+            mysqli_stmt_bind_param($stmt_cart, "si", $head_status, $current_user);
+            mysqli_stmt_execute($stmt_cart);
+            $result_cart = mysqli_stmt_get_result($stmt_cart);
             $total_active_carts = 0;
             if ($result_cart && $row = mysqli_fetch_assoc($result_cart)) {
                 $total_active_carts = $row['total_cart'];
             }
             ?>
-            <a href="<?= root_url ?>admin/dashboard.php"><img src="./images/users/<?= $user['picture'] ?>"></a>
-            <a href="<?= root_url ?>admin/cart.php"><ion-icon name="cart-outline"></ion-icon>(<?= $total_active_carts ?>)</a>
+            <a href="<?= root_url ?>admin/dashboard.php"><img src="./images/users/<?= htmlspecialchars($user['picture'], ENT_QUOTES, 'UTF-8') ?>"></a>
+            <a href="<?= root_url ?>admin/cart.php"><ion-icon name="cart-outline"></ion-icon>(<?= htmlspecialchars($total_active_carts, ENT_QUOTES, 'UTF-8') ?>)</a>
             <?php else : ?>
             <a href="<?php echo root_url ?>login.php">Log in</a>
             <?php endif ?>

@@ -4,10 +4,13 @@
         include "./partials/header.php";
         // get id from url
         if (isset($_GET['id'])) {
-            $id = filter_var($_GET['id'], FILTER_SANITIZE_NUMBER_INT);
+            $id = (int) $_GET['id'];
             // select product with that id
-            $select = "SELECT * FROM products WHERE id=$id";
-            $query = mysqli_query($connection, $select);
+            $select = "SELECT * FROM products WHERE id=?";
+            $stmt = mysqli_prepare($connection, $select);
+            mysqli_stmt_bind_param($stmt, "i", $id);
+            mysqli_stmt_execute($stmt);
+            $query = mysqli_stmt_get_result($stmt);
             if (mysqli_num_rows($query) == 1) {
                 $product = mysqli_fetch_assoc($query);
             }
@@ -24,14 +27,14 @@
     <section class="cart">
         <div class="cart_item">
             <div class="cart_img">
-                <img src="./images/items/<?= $product['picture'] ?>">
+                <img src="./images/items/<?= htmlspecialchars($product['picture'], ENT_QUOTES, 'UTF-8') ?>">
             </div>
             <div class="cart_info">
-                <h3><?= $product['product'] ?></h3>
-                <p>$<?= $product['price'] ?></p>
+                <h3><?= htmlspecialchars($product['product'], ENT_QUOTES, 'UTF-8') ?></h3>
+                <p>$<?= htmlspecialchars($product['price'], ENT_QUOTES, 'UTF-8') ?></p>
                 <form action="admin/single_logic.php" method="post">
-                    <input type="hidden" name="customer" value="<?= $user['id'] ?>">
-                    <input type="hidden" name="id" value="<?= $product['id'] ?>">
+                    <input type="hidden" name="customer" value="<?= $_SESSION['user_id'] ?? null ?>">
+                    <input type="hidden" name="id" value="<?= htmlspecialchars($product['id'], ENT_QUOTES, 'UTF-8') ?>">
                     <label for="qty">Quantity</label>
                     <input type="number" name="qty" min="1">
                     <br><br>

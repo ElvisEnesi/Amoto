@@ -10,9 +10,9 @@
     // logged in
     if (isset($_POST['submit'])) {
         // declare variables
-        $customer_id = filter_var($_POST['customer'], FILTER_SANITIZE_NUMBER_INT);
-        $product_id = filter_var($_POST['id'], FILTER_SANITIZE_NUMBER_INT);
-        $quantity = filter_var($_POST['qty'], FILTER_SANITIZE_NUMBER_INT);
+        $customer_id = (int) $_POST['customer'];
+        $product_id = (int) $_POST['id'];
+        $quantity = (int) $_POST['qty'];
         // validate inputs
         if (!is_numeric($quantity)) {
             $_SESSION['single_logic'] = "Quantity must be a number!!";
@@ -25,8 +25,10 @@
             die();
         } else {
            // insert into cart
-           $insert = "INSERT INTO cart SET customer_id='$customer_id', product_id='$product_id', quantity='$quantity'";
-           $query = mysqli_query($connection, $insert);
+           $insert = "INSERT INTO cart SET customer_id=?, product_id=?, quantity=?";
+           $stmt = mysqli_prepare($connection, $insert);
+           mysqli_stmt_bind_param($stmt, "iiii", $customer_id, $product_id, $quantity);
+           $query = mysqli_stmt_execute($stmt);
            if (!mysqli_errno($connection)) {
                 $_SESSION['success'] = "Item successfully added to cart!!";
                 header("location: " . root_url . "admin/cart.php");
@@ -36,7 +38,6 @@
                 header("location: " . root_url . "shop.php");
                 die();
            }
-           
         }
     } else {
         header("location: " . root_url . "admin/single.php");

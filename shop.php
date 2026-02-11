@@ -24,11 +24,11 @@
         <?php while ($product = mysqli_fetch_assoc($query_products)) : ?>
         <div class="card">
             <div class="card_img">
-                <img src="./images/items/<?= $product['picture'] ?>" onclick="window.location.href='<?= root_url ?>single.php?id=<?= $product['id'] ?>'">
+                <img src="./images/items/<?= htmlspecialchars($product['picture'], ENT_QUOTES, 'UTF-8') ?>" onclick="window.location.href='<?= root_url ?>single.php?id=<?= htmlspecialchars($product['id'], ENT_QUOTES, 'UTF-8') ?>'">
                 <div class="card_featured">Best seller</div>
             </div>
-            <p><?= $product['product'] ?></p>
-            <span class="price">$<?= $product['price'] ?></span>
+            <p><?= htmlspecialchars($product['product'], ENT_QUOTES, 'UTF-8') ?></p>
+            <span class="price">$<?= htmlspecialchars($product['price'], ENT_QUOTES, 'UTF-8') ?></span>
         </div>
         <?php endwhile ?>
     </section>
