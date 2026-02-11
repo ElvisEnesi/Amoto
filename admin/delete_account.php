@@ -8,13 +8,7 @@
     }
     // get id from url
     if (isset($_GET['id'])) {
-        $id = filter_var($_GET['id'], FILTER_SANITIZE_NUMBER_INT);
-        $edit_search = "SELECT * FROM user WHERE id=?";
-        $stmt = mysqli_prepare($connection, $edit_search);
-        mysqli_stmt_bind_param($stmt, "i", $id);
-        mysqli_stmt_execute($stmt);
-        $result = mysqli_stmt_get_result($stmt);
-        $edit = mysqli_fetch_assoc($result);
+        $id = (int) $_GET['id'];
     }
 ?>
 <!DOCTYPE html>
@@ -30,8 +24,8 @@
         <form>
             <h1>Delete your account??</h1>
             <div class="links">
-                <a href="<?= root_url ?>admin/delete_account_logic.php?id=<?= htmlspecialchars($edit['id'], ENT_QUOTES, 'UTF-8') ?>">Yes</a>
-                <a href="dashboard.php">No</a>
+                <a href="<?= root_url ?>admin/delete_account_logic.php?id=<?= htmlspecialchars($id, ENT_QUOTES, 'UTF-8') ?>">Yes</a>
+                <a href="<?= root_url ?>admin/dashboard.php">No</a>
             </div>
         </form>
     </section>

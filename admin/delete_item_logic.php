@@ -14,16 +14,15 @@
         if (!mysqli_errno($connection)) {
             // redirect with success message
             $_SESSION['delete_success'] = "Item successfully deleted!!";
-            header("location: " . root_url . "admin/manage_items.php");
-            die();
         } else {
             // redirect with error message
             $_SESSION['delete_error'] = "Couldn't delete item!!";
-            header("location: " . root_url . "admin/manage_items.php");
-            die();
         }
+        // redirect to manage items page
+        header("location: " . root_url . "admin/manage_items.php");
+        die();
     } else {
-        // redirect back to manage category
+        // redirect back to manage items
         header("location: " . root_url . "admin/manage_items.php");
         die();
     }

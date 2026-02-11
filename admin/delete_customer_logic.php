@@ -14,14 +14,12 @@
         if (!mysqli_errno($connection)) {
             // redirect with success message
             $_SESSION['delete_success'] = "Customer successfully deleted!!";
-            header("location: " . root_url . "admin/customers.php");
-            die();
         } else {
             // redirect with error message
             $_SESSION['delete_error'] = "Couldn't delete this customer!!";
-            header("location: " . root_url . "admin/customers.php");
-            die();
         }
+        header("location: " . root_url . "admin/customers.php");
+        die();
     } else {
         // redirect back to manage category
         header("location: " . root_url . "admin/customers.php");

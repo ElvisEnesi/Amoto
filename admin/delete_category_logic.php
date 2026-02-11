@@ -20,14 +20,13 @@
         if (!mysqli_errno($connection)) {
             // redirect with success message
             $_SESSION['delete_success'] = "Category successfully deleted!!";
-            header("location: " . root_url . "admin/manage_category.php");
-            die();
         } else {
             // redirect with error message
             $_SESSION['delete_error'] = "Couldn't delete category!!";
-            header("location: " . root_url . "admin/manage_category.php");
-            die();
         }
+        // redirect
+        header("location: " . root_url . "admin/manage_category.php");
+        die();
     } else {
         // redirect back to manage category
         header("location: " . root_url . "admin/manage_category.php");
