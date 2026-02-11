@@ -3,7 +3,7 @@
         include "./partials/header.php";
         include "../partials/nav.php";
         // current user
-        $current_user = $_SESSION['user_id'];
+        $current_user = $_SESSION['user_id'] ?? null;
         // check transaction errors
         $transaction_select = "SELECT COUNT(*) AS failed_count FROM transaction_log 
         WHERE user_id = ? AND actions_logged = ? AND created_at >= NOW() - INTERVAL 10 MINUTE";
@@ -78,7 +78,6 @@
                     <p>Payments are unavailable!! suspicious activity detected!!</p>
                 <?php else : ?>
                 <form action="<?= root_url ?>admin/payment_decision.php?id=<?= htmlspecialchars($cart['id'], ENT_QUOTES, 'UTF-8') ?>" method="post">
-                    <input type="hidden" name="id" value="<?= htmlspecialchars($cart['id'], ENT_QUOTES, 'UTF-8') ?>">
                     <button type="submit" name="payment">Proceed to payment!!</button>
                     <button type="submit" name="delete">Remove from cart!!</button>
                 </form>

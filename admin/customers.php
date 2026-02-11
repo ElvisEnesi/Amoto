@@ -2,7 +2,7 @@
         include "./configuration/database.php";
         include "./partials/header.php";
         // 
-        $current_admin_user = $_SESSION['user_id'];
+        $current_admin_user = $_SESSION['user_id'] ?? null;
         $select_user = "SELECT * FROM user WHERE NOT id=?";
         $stmt_user = mysqli_prepare($connection, $select_user);
         mysqli_stmt_bind_param($stmt_user, "i", $current_admin_user);
@@ -79,7 +79,7 @@
                 <?php while ($user = mysqli_fetch_assoc($query_user)) : ?>
                 <tr>
                     <td><?= htmlspecialchars($user['id'], ENT_QUOTES, 'UTF-8') ?></td>
-                    <td><?= "{$user['first_name']} {$user['last_name']}" ?></td>
+                    <td><?= htmlspecialchars("{$user['first_name']} {$user['last_name']}", ENT_QUOTES, 'UTF-8') ?></td>
                     <td><?= htmlspecialchars($user['user_name'], ENT_QUOTES, 'UTF-8') ?></td>
                     <td><?= htmlspecialchars($user['email'], ENT_QUOTES, 'UTF-8') ?></td>
                     <td><?= htmlspecialchars($user['address'], ENT_QUOTES, 'UTF-8') ?></td>

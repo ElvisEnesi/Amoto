@@ -6,7 +6,7 @@
         header("location: " . root_url . "login.php");
         die();
     }
-    $current_payment = $_SESSION['user_id'];
+    $current_payment = $_SESSION['user_id'] ?? null;
     // get id from url
     if (isset($_GET['id'])) {
         $id = (int) $_GET['id'];
@@ -85,14 +85,6 @@
         if ($join_query && $gotten = mysqli_fetch_assoc($join_result)) {
             $total_price = $gotten['price'] * $gotten['quantity'];
         }
-        // select product details
-        $product_id = $edit['product_id'];
-        $select_product = "SELECT * FROM products WHERE id = ?";
-        $query_product = mysqli_prepare($connection, $select_product);
-        mysqli_stmt_bind_param($query_product, "i", $product_id);
-        mysqli_stmt_execute($query_product);
-        $product = mysqli_stmt_get_result($query_product);
-        $product = mysqli_fetch_assoc($product);
     ?>
     <?php if ($transaction['failed_count'] >= 5 || $bot['attempt'] >= 3): ?>
         <?php
@@ -107,11 +99,7 @@
     <?php else : ?>
     <section class="form">
         <div>Total checkout price is $<?= htmlspecialchars(number_format($total_price, 2), ENT_QUOTES, 'UTF-8') ?></div>
-        <form action="<?= root_url ?>admin/payment_logic.php" method="post" enctype="multipart/form-data">
-            <input type="hidden" name="id" value="<?= htmlspecialchars($edit['id'], ENT_QUOTES, 'UTF-8') ?>">
-            <input type="hidden" name="product_id" value="<?= htmlspecialchars($product['id'], ENT_QUOTES, 'UTF-8') ?>">
-            <input type="hidden" name="product_name" value="<?= htmlspecialchars($product['product'], ENT_QUOTES, 'UTF-8') ?>">
-            <input type="hidden" name="total" value="<?= htmlspecialchars($total_price, ENT_QUOTES, 'UTF-8') ?>">
+        <form action="<?= root_url ?>admin/payment_logic.php?id=<?= htmlspecialchars($edit['id'], ENT_QUOTES, 'UTF-8') ?>" method="post" enctype="multipart/form-data">
             <input type="file" name="avatar">
             <button type="submit" name="submit">Submit</button>
         </form>

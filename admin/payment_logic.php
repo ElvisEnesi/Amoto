@@ -1,13 +1,38 @@
 <?php
     include "./configuration/constant.php";
     include "./configuration/database.php";
+    // current user
+    $current_payment = $_SESSION['user_id'] ?? null;
+    // get id from url
+    if (isset($_GET['id'])) {
+        $id = (int) $_GET['id'];
+        $edit_search = "SELECT * FROM cart WHERE id = ?";
+        $edit_query = mysqli_prepare($connection, $edit_search);
+        mysqli_stmt_bind_param($edit_query, "i", $id);
+        mysqli_stmt_execute($edit_query);
+        $result = mysqli_stmt_get_result($edit_query);
+        $edit = mysqli_fetch_assoc($result);
+    } else {
+        header("location: " . root_url . "admin/cart.php");
+        die();
+    }
+    $join = "SELECT p.id AS product_id, p.product AS title, p.price AS price, c.quantity AS quantity, c.product_id AS cart_product_id FROM cart c 
+    INNER JOIN products p ON c.product_id = p.id WHERE c.status = ? AND c.customer_id = ?";
+    $join_query= mysqli_prepare($connection, $join);
+    $status = "active";
+    mysqli_stmt_bind_param($join_query, "si", $status, $current_payment);
+    mysqli_stmt_execute($join_query);
+    $join_result = mysqli_stmt_get_result($join_query);
+    $gotten = mysqli_fetch_assoc($join_result);
+
     // payment logic
     if (isset($_POST['submit'])) {
         // declare variables
-        $cart_id = (int) $_POST['id'];
-        $product_id = (int) $_POST['product_id'];
-        $product_name = (string) $_POST['product_name'];
-        $total = (int) $_POST['total'];
+        $cart_id = (int) $edit['id'];
+        $product_id = (int) $gotten['product_id'];
+        $product_name = (string) $gotten['title'];
+        $quantity = (int) $gotten['quantity'];
+        $total_price = (int) $gotten['price'] * (int) $gotten['quantity'];
         $avatar = $_FILES['avatar'];
         $customer_id = $_SESSION['user_id'];
         // ip address function
@@ -34,8 +59,6 @@
         mysqli_stmt_execute($error);
         if (!$avatar['name']) {
             $_SESSION['payment_logic'] = "Choose an image!!";
-        } elseif (!is_numeric($product_id) || !is_numeric($total) || !is_numeric($cart_id)) {
-            $_SESSION['payment_logic'] = "Product ID is not a number!!";
         } else {
             // work on
             $avatar_name = $avatar['name'];
@@ -70,9 +93,9 @@
             die();
         } else {
             // insert into orders
-            $insert = "INSERT INTO orders SET customer_id=?, cart_id=?, product_id=?, product_name=?, total=?, picture=?";
+            $insert = "INSERT INTO orders SET customer_id=?, cart_id=?, product_id=?, product_name=?, total=?, quantity=?, picture=?";
             $query = mysqli_prepare($connection, $insert);
-            mysqli_stmt_bind_param($query, "iiisis", $customer_id, $cart_id, $product_id, $product_name, $total, $avatar_name);
+            mysqli_stmt_bind_param($query, "iiisiis", $customer_id, $cart_id, $product_id, $product_name, $total_price, $quantity, $avatar_name);
             mysqli_stmt_execute($query);
             if (!mysqli_errno($connection)) {
                 // insert into transaction log

@@ -11,6 +11,8 @@
         // validating inputs
         if (!$title || !$price || !$category || !$avatar['name']) {
             $_SESSION['add_item'] = "Fill in all inputs!";
+        } elseif (!is_numeric($price) || !is_numeric($category)) {
+            $_SESSION['add_item'] = "Price and Category must be numbers!";
         } else {
             // work on image on this
             $avatar_name = $avatar['name'];

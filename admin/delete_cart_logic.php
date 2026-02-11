@@ -14,18 +14,24 @@
         if (!mysqli_errno($connection)) {
             // redirect with success message
             $_SESSION['delete_success'] = "Cart successfully deleted!!";
-            header("location: " . root_url . "admin/manage_carts.php");
             die();
         } else {
             // redirect with error message
             $_SESSION['delete_error'] = "Couldn't delete cart!!";
-            header("location: " . root_url . "admin/manage_carts.php");
             die();
         }
+        if (isset($_SESSION['i_am_admin'])) {
+            header("location: " . root_url . "admin/manage_carts.php");
+        } else {
+            header("location: " . root_url . "admin/cart.php");
+        }
     } else {
-        // redirect back to manage category
-        header("location: " . root_url . "admin/manage_carts.php");
-        die();
+        // redirect back if id was not gotten
+        if (isset($_SESSION['i_am_admin'])) {
+            header("location: " . root_url . "admin/manage_carts.php");
+        } else {
+            header("location: " . root_url . "admin/cart.php");
+        }
     }
     
     

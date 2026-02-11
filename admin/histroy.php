@@ -34,8 +34,9 @@
                 <img src="../images/items/<?= htmlspecialchars($product['picture'], ENT_QUOTES, 'UTF-8') ?>">
             </div>
             <div class="cart_info">
-                <h3><?= htmlspecialchars($product['name'], ENT_QUOTES, 'UTF-8') ?></h3>
-                <p>$<?= htmlspecialchars($product['price'], ENT_QUOTES, 'UTF-8') ?></p>
+                <h3><?= htmlspecialchars($order['product_name'], ENT_QUOTES, 'UTF-8') ?></h3>
+                <p>$<?= htmlspecialchars($order['total'], ENT_QUOTES, 'UTF-8') ?></p>
+                <p>Quantity: <?= htmlspecialchars($order['quantity'], ENT_QUOTES, 'UTF-8') ?></p>
                 <p>Status: "<?= htmlspecialchars($order['status'], ENT_QUOTES, 'UTF-8') ?>"</p>
             </div>
         </div>
