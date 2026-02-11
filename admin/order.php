@@ -36,7 +36,7 @@
             <a href="manage_items.php">Manage Items</a>
             <a href="manage_carts.php">Manage Carts</a>
             <a href="customers.php">View Customers</a>
-            <a href="transactions.php">Transactions</a>
+            <a href="transactions.php">Activities</a>
             <a href="order.php" class="active">View Orders</a>
             <?php endif ?>
             <a href="histroy.php">Order History</a>
@@ -61,26 +61,32 @@
                 <?php
                     // select custome
                     $customer_id = $order['customer_id'];
-                    $select_customer = "SELECT * FROM user WHERE id=$customer_id";
-                    $query_customer = mysqli_query($connection, $select_customer);
+                    $select_customer = "SELECT * FROM user WHERE id=?";
+                    $stmt_customer = mysqli_prepare($connection, $select_customer);
+                    mysqli_stmt_bind_param($stmt_customer, "i", $customer_id);
+                    mysqli_stmt_execute($stmt_customer);
+                    $query_customer = mysqli_stmt_get_result($stmt_customer);
                     $customer = mysqli_fetch_assoc($query_customer);
                     // select cart
                     $cart_id = $order['cart_id'];
-                    $select_cart = "SELECT * FROM cart WHERE id=$cart_id";
-                    $query_cart = mysqli_query($connection, $select_cart);
+                    $select_cart = "SELECT * FROM cart WHERE id=?";
+                    $stmt_cart = mysqli_prepare($connection, $select_cart);
+                    mysqli_stmt_bind_param($stmt_cart, "i", $cart_id);
+                    mysqli_stmt_execute($stmt_cart);
+                    $query_cart = mysqli_stmt_get_result($stmt_cart);
                     $cart = mysqli_fetch_assoc($query_cart);
                 ?>
                 <tr>
-                    <td><?= $order['id'] ?></td>
-                    <td><?= $order['customer_id'] ?></td>
-                    <td><?= $order['product_name'] ?></td>
-                    <td>$<?= $order['total'] ?></td>
-                    <td><?= $cart['quantity'] ?></td>
-                    <td><?= $customer['address'] ?></td>
-                    <td><?= $order['status'] ?></td>
-                    <td><a href="../images/payment/<?= $order['picture'] ?> " download="">Download</a></td>
-                    <td><?= $order['date'] ?></td>
-                    <td><a href="<?= root_url ?>admin/edit_status.php?id=<?= $order['id'] ?>">Edit</a></td>
+                    <td><?= htmlspecialchars($order['id'], ENT_QUOTES, 'UTF-8') ?></td>
+                    <td><?= htmlspecialchars($order['customer_id'], ENT_QUOTES, 'UTF-8') ?></td>
+                    <td><?= htmlspecialchars($order['product_name'], ENT_QUOTES, 'UTF-8') ?></td>
+                    <td>$<?= htmlspecialchars($order['total'], ENT_QUOTES, 'UTF-8') ?></td>
+                    <td><?= htmlspecialchars($cart['quantity'], ENT_QUOTES, 'UTF-8') ?></td>
+                    <td><?= htmlspecialchars($customer['address'], ENT_QUOTES, 'UTF-8') ?></td>
+                    <td><?= htmlspecialchars($order['status'], ENT_QUOTES, 'UTF-8') ?></td>
+                    <td><a href="../images/payment/<?= htmlspecialchars($order['picture'], ENT_QUOTES, 'UTF-8') ?> " download="">Download</a></td>
+                    <td><?= htmlspecialchars($order['date'], ENT_QUOTES, 'UTF-8') ?></td>
+                    <td><a href="<?= root_url ?>admin/edit_status.php?id=<?= htmlspecialchars($order['id'], ENT_QUOTES, 'UTF-8') ?>">Edit</a></td>
                 </tr>
                 <?php endwhile ?>
             </table>

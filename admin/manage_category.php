@@ -69,7 +69,7 @@
             <a href="manage_items.php">Manage Items</a>
             <a href="manage_carts.php">Manage Carts</a>
             <a href="customers.php">View Customers</a>
-            <a href="transactions.php">Transactions</a>
+            <a href="transactions.php">Activities</a>
             <a href="order.php">View Orders</a>
             <?php endif ?>
             <a href="histroy.php">Order History</a>
@@ -86,10 +86,10 @@
                 </tr>
                 <?php while ($category = mysqli_fetch_assoc($category_query)) : ?>
                 <tr>
-                    <td><?= $category['id'] ?></td>
-                    <td><?= $category['title'] ?></td>
-                    <td><a href="edit_category.php?id=<?= $category['id'] ?>">Edit</a></td>
-                    <td><a href="delete_category.php?id=<?= $category['id'] ?>" class="danger">Delete</a></td>
+                    <td><?= htmlspecialchars($category['id'], ENT_QUOTES, 'UTF-8') ?></td>
+                    <td><?= htmlspecialchars($category['title'], ENT_QUOTES, 'UTF-8') ?></td>
+                    <td><a href="edit_category.php?id=<?= htmlspecialchars($category['id'], ENT_QUOTES, 'UTF-8') ?>">Edit</a></td>
+                    <td><a href="delete_category.php?id=<?= htmlspecialchars($category['id'], ENT_QUOTES, 'UTF-8') ?>" class="danger">Delete</a></td>
                 </tr>
                 <?php endwhile ?>
             </table>

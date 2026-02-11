@@ -68,7 +68,7 @@
             <a href="manage_items.php" class="active">Manage Items</a>
             <a href="manage_carts.php">Manage Carts</a>
             <a href="customers.php">View Customers</a>
-            <a href="transactions.php">Transactions</a>
+            <a href="transactions.php">Activities</a>
             <a href="order.php">View Orders</a>
             <?php endif ?>
             <a href="histroy.php">Order History</a>
@@ -88,17 +88,20 @@
                 <?php while ($item = mysqli_fetch_assoc($query_items)) : ?>
                 <?php
                     $category_num = $item['category_id'];
-                    $select_category = "SELECT * FROM category WHERE id=$category_num";
-                    $query_category = mysqli_query($connection, $select_category);
+                    $select_category = "SELECT * FROM category WHERE id=?";
+                    $stmt_category = mysqli_prepare($connection, $select_category);
+                    mysqli_stmt_bind_param($stmt_category, "i", $category_num);
+                    mysqli_stmt_execute($stmt_category);
+                    $query_category = mysqli_stmt_get_result($stmt_category);
                     $gotten_category = mysqli_fetch_assoc($query_category);//
                 ?>
                 <tr>
-                    <td><?= $item['id'] ?></td>
-                    <td><?= $item['product'] ?></td>
-                    <td>$<?= $item['price'] ?></td>
-                    <td><?= $gotten_category['title'] ?></td>
-                    <td><a href="edit_item.php?id=<?= $item['id'] ?>">Edit</a></td>
-                    <td><a href="delete_item.php?id=<?= $item['id'] ?>" class="danger">Delete</a></td>
+                    <td><?= htmlspecialchars($item['id'], ENT_QUOTES, 'UTF-8') ?></td>
+                    <td><?= htmlspecialchars($item['product'], ENT_QUOTES, 'UTF-8') ?></td>
+                    <td>$<?= htmlspecialchars($item['price'], ENT_QUOTES, 'UTF-8') ?></td>
+                    <td><?= htmlspecialchars($gotten_category['title'], ENT_QUOTES, 'UTF-8') ?></td>
+                    <td><a href="edit_item.php?id=<?= htmlspecialchars($item['id'], ENT_QUOTES, 'UTF-8') ?>">Edit</a></td>
+                    <td><a href="delete_item.php?id=<?= htmlspecialchars($item['id'], ENT_QUOTES, 'UTF-8') ?>" class="danger">Delete</a></td>
                 </tr>
                 <?php endwhile ?>
             </table>

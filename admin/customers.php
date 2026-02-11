@@ -3,8 +3,11 @@
         include "./partials/header.php";
         // 
         $current_admin_user = $_SESSION['user_id'];
-        $select_user = "SELECT * FROM user WHERE NOT id=$current_admin_user";
-        $query_user = mysqli_query($connection, $select_user);
+        $select_user = "SELECT * FROM user WHERE NOT id=?";
+        $stmt_user = mysqli_prepare($connection, $select_user);
+        mysqli_stmt_bind_param($stmt_user, "i", $current_admin_user);
+        mysqli_stmt_execute($stmt_user);
+        $query_user = mysqli_stmt_get_result($stmt_user);
     ?>
     <?php  
         if (isset($_SESSION['edit_customer_success'])) {
@@ -54,7 +57,7 @@
             <a href="manage_items.php">Manage Items</a>
             <a href="manage_carts.php">Manage Carts</a>
             <a href="customers.php" class="active">View Customers</a>
-            <a href="transactions.php">Transactions</a>
+            <a href="transactions.php">Activities</a>
             <a href="order.php">View Orders</a>
             <?php endif ?>
             <a href="histroy.php">Order History</a>
@@ -75,14 +78,14 @@
                 </tr>
                 <?php while ($user = mysqli_fetch_assoc($query_user)) : ?>
                 <tr>
-                    <td><?= $user['id'] ?></td>
+                    <td><?= htmlspecialchars($user['id'], ENT_QUOTES, 'UTF-8') ?></td>
                     <td><?= "{$user['first_name']} {$user['last_name']}" ?></td>
-                    <td><?= $user['user_name'] ?></td>
-                    <td><?= $user['email'] ?></td>
-                    <td><?= $user['address'] ?></td>
-                    <td><?= $user['fraud_status'] ?></td>
-                    <td><a href="<?= root_url ?>admin/edit_customer.php?id=<?= $user['id'] ?>">Edit</a></td>
-                    <td><a href="<?= root_url ?>admin/delete_customer.php?id=<?= $user['id'] ?>" class="danger">Delete</a></td>
+                    <td><?= htmlspecialchars($user['user_name'], ENT_QUOTES, 'UTF-8') ?></td>
+                    <td><?= htmlspecialchars($user['email'], ENT_QUOTES, 'UTF-8') ?></td>
+                    <td><?= htmlspecialchars($user['address'], ENT_QUOTES, 'UTF-8') ?></td>
+                    <td><?= htmlspecialchars($user['fraud_status'], ENT_QUOTES, 'UTF-8') ?></td>
+                    <td><a href="<?= root_url ?>admin/edit_customer.php?id=<?= htmlspecialchars($user['id'], ENT_QUOTES, 'UTF-8') ?>">Edit</a></td>
+                    <td><a href="<?= root_url ?>admin/delete_customer.php?id=<?= htmlspecialchars($user['id'], ENT_QUOTES, 'UTF-8') ?>" class="danger">Delete</a></td>
                 </tr>
                 <?php endwhile ?>
             </table>

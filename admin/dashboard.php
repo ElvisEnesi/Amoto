@@ -75,18 +75,18 @@
         <main>
             <div class="profile">
                 <div class="profile_img">
-                    <img src="../images/users/<?php echo $user['picture']; ?>">
-                    <div class="edit"><a href="edit_image.php?id=<?php echo $user['id'] ?>"><ion-icon name="pencil-outline"></ion-icon></a></div>
+                    <img src="../images/users/<?php echo htmlspecialchars($user['picture'], ENT_QUOTES, 'UTF-8'); ?>">
+                    <div class="edit"><a href="edit_image.php?id=<?php echo htmlspecialchars($user['id'], ENT_QUOTES, 'UTF-8') ?>"><ion-icon name="pencil-outline"></ion-icon></a></div>
                 </div>
                 <div class="profile_info">
-                    <p>Name: <?php echo "{$user['first_name']} {$user['last_name']}" ?></p>
-                    <p>Username: <?php echo $user['user_name'] ?></p>
-                    <p>Email: <?php echo $user['email'] ?></p>
+                    <p>Name: <?php echo htmlspecialchars("{$user['first_name']} {$user['last_name']}", ENT_QUOTES, 'UTF-8') ?></p>
+                    <p>Username: <?php echo htmlspecialchars($user['user_name'], ENT_QUOTES, 'UTF-8') ?></p>
+                    <p>Email: <?php echo htmlspecialchars($user['email'], ENT_QUOTES, 'UTF-8') ?></p>
                     <div class="profile_buttons">
-                        <button onclick="window.location.href='edit_password.php?id=<?php echo $user['id'] ?>'">Change Password</button>
-                        <button onclick="window.location.href='edit_image.php?id=<?php echo $user['id'] ?>'">Change Image</button>
-                        <button onclick="window.location.href='edit_details.php?id=<?php echo $user['id'] ?>'">Edit Details</button>
-                        <button onclick="window.location.href='delete_account.php?id=<?php echo $user['id'] ?>'">Delete Account</button>
+                        <button onclick="window.location.href='edit_password.php?id=<?php echo htmlspecialchars($user['id'], ENT_QUOTES, 'UTF-8') ?>'">Change Password</button>
+                        <button onclick="window.location.href='edit_image.php?id=<?php echo htmlspecialchars($user['id'], ENT_QUOTES, 'UTF-8') ?>'">Change Image</button>
+                        <button onclick="window.location.href='edit_details.php?id=<?php echo htmlspecialchars($user['id'], ENT_QUOTES, 'UTF-8') ?>'">Edit Details</button>
+                        <button onclick="window.location.href='delete_account.php?id=<?php echo htmlspecialchars($user['id'], ENT_QUOTES, 'UTF-8') ?>'">Delete Account</button>
                     </div>
                 </div>
             </div>

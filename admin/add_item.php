@@ -34,7 +34,7 @@
             <input type="number" name="price" placeholder="Price">
             <select name="category">
                 <?php while ($category = mysqli_fetch_assoc($query_category)) : ?>
-                <option value="<?= $category['id'] ?>"><?= $category['title'] ?></option>
+                <option value="<?= htmlspecialchars($category['id'], ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($category['title'], ENT_QUOTES, 'UTF-8') ?></option>
                 <?php endwhile ?>
             </select>
             <input type="file" name="avatar">

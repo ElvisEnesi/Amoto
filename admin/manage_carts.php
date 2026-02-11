@@ -1,8 +1,12 @@
     <?php
         include "./configuration/database.php";
         include "./partials/header.php";
-        $select_cart = "SELECT * FROM cart WHERE status='checked_out' ORDER BY id DESC";
-        $query_cart = mysqli_query($connection, $select_cart);
+        $select_cart = "SELECT * FROM cart WHERE status=? ORDER BY id DESC";
+        $stmt_cart = mysqli_prepare($connection, $select_cart);
+        $status = "checked_out";
+        mysqli_stmt_bind_param($stmt_cart, "s", $status);
+        mysqli_stmt_execute($stmt_cart);
+        $query_cart = mysqli_stmt_get_result($stmt_cart);
     ?>
     <?php  
         if (isset($_SESSION['delete_success'])) {
@@ -36,7 +40,7 @@
             <a href="manage_items.php">Manage Items</a>
             <a href="manage_carts.php" class="active">Manage Carts</a>
             <a href="customers.php">View Customers</a>
-            <a href="transactions.php">Transactions</a>
+            <a href="transactions.php">Activities</a>
             <a href="order.php">View Orders</a>
             <?php endif ?>
             <a href="histroy.php">Order History</a>
@@ -57,17 +61,20 @@
                 <?php 
                     // select item details
                     $item_id = $cart['product_id'];
-                    $select_item = "SELECT * FROM products WHERE id='$item_id'";
-                    $query_items = mysqli_query($connection, $select_item);
+                    $select_item = "SELECT * FROM products WHERE id=?";
+                    $stmt_item = mysqli_prepare($connection, $select_item);
+                    mysqli_stmt_bind_param($stmt_item, "i", $item_id);
+                    mysqli_stmt_execute($stmt_item);
+                    $query_items = mysqli_stmt_get_result($stmt_item);
                     $items = mysqli_fetch_assoc($query_items);
                 ?>
                 <tr>
-                    <td><?= $cart['id'] ?></td>
-                    <td><?= $items['product'] ?></td>
-                    <td>$<?= $items['price'] ?></td>
-                    <td><?= $cart['quantity'] ?></td>
-                    <td><?= $cart['status'] ?></td>
-                    <td><a href="delete_cart.php?id=<?= $cart['id'] ?>" class="danger">Delete</a></td>
+                    <td><?= htmlspecialchars($cart['id'], ENT_QUOTES, 'UTF-8') ?></td>
+                    <td><?= htmlspecialchars($items['product'], ENT_QUOTES, 'UTF-8') ?></td>
+                    <td>$<?= htmlspecialchars($items['price'], ENT_QUOTES, 'UTF-8') ?></td>
+                    <td><?= htmlspecialchars($cart['quantity'], ENT_QUOTES, 'UTF-8') ?></td>
+                    <td><?= htmlspecialchars($cart['status'], ENT_QUOTES, 'UTF-8') ?></td>
+                    <td><a href="delete_cart.php?id=<?= htmlspecialchars($cart['id'], ENT_QUOTES, 'UTF-8') ?>" class="danger">Delete</a></td>
                 </tr>
                 <?php endwhile ?>
                 <?php else : ?>

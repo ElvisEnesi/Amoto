@@ -4,8 +4,8 @@
     include "./configuration/database.php";
     if (isset($_POST['submit'])) {
         // declare variables
-        $title = filter_var($_POST['title'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-        $description = filter_var($_POST['description'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        $title = (string) $_POST['title'];
+        $description = (string) $_POST['description'];
         // validating inputs
         if (!$title || !$description) {
             $_SESSION['add_category'] = "Fill in all inputs!";
@@ -14,8 +14,10 @@
             header("location: " . root_url . "admin/add_category.php");
             die();
         } else {
-            $insert = "INSERT INTO category SET title='$title', description='$description'";
-            $query = mysqli_query($connection, $insert);
+            $insert = "INSERT INTO category SET title=?, description=?";
+            $stmt = mysqli_prepare($connection, $insert);
+            mysqli_stmt_bind_param($stmt, "ss", $title, $description);
+            mysqli_stmt_execute($stmt);
             if (!mysqli_errno($connection)) {
                 $_SESSION['add_category_success'] = "Category successfully created!!";
                 header("location: " . root_url . "admin/manage_category.php");

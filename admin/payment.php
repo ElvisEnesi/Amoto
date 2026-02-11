@@ -9,9 +9,12 @@
     $current_payment = $_SESSION['user_id'];
     // get id from url
     if (isset($_GET['id'])) {
-        $id = filter_var($_GET['id'], FILTER_SANITIZE_NUMBER_INT);
-        $edit_search = "SELECT * FROM cart WHERE id=$id";
-        $result = mysqli_query($connection, $edit_search);
+        $id = (int) $_GET['id'];
+        $edit_search = "SELECT * FROM cart WHERE id = ?";
+        $edit_query = mysqli_prepare($connection, $edit_search);
+        mysqli_stmt_bind_param($edit_query, "i", $id);
+        mysqli_stmt_execute($edit_query);
+        $result = mysqli_stmt_get_result($edit_query);
         $edit = mysqli_fetch_assoc($result);
     }
     // ip address function
@@ -32,16 +35,24 @@
         }
     // ip address
     $user_ip = get_ip_address();
-    // check transaction errors/
+    // check transaction errors
     $transaction_select = "SELECT COUNT(*) AS failed_count FROM transaction_log 
-    WHERE user_id = $current_payment AND actions_logged = 'payment_failed' AND created_at >= NOW() - INTERVAL 10 MINUTE";
-    $transaction_query = mysqli_query($connection, $transaction_select);
-    $transaction = mysqli_fetch_assoc($transaction_query);
+    WHERE user_id = ? AND actions_logged = ? AND created_at >= NOW() - INTERVAL 10 MINUTE";
+    $transaction_query = mysqli_prepare($connection, $transaction_select);
+    $failed_status = "payment_failed";
+    mysqli_stmt_bind_param($transaction_query, "is", $current_payment, $failed_status);
+    mysqli_stmt_execute($transaction_query);
+    $transaction = mysqli_stmt_get_result($transaction_query);
+    $transaction = mysqli_fetch_assoc($transaction);
     // check bot behaviours
     $bot_select = "SELECT COUNT(*) AS attempt FROM transaction_log 
-    WHERE user_id = $current_payment AND actions_logged = 'payment_attempt' AND created_at >= NOW() - INTERVAL 5 MINUTE";
-    $bot_query = mysqli_query($connection, $bot_select);
-    $bot = mysqli_fetch_assoc($bot_query);
+    WHERE user_id = ? AND actions_logged = ? AND created_at >= NOW() - INTERVAL 5 MINUTE";
+    $bot_query = mysqli_prepare($connection, $bot_select);
+    $bot_status = "payment_attempt";
+    mysqli_stmt_bind_param($bot_query, "is", $current_payment, $bot_status);
+    mysqli_stmt_execute($bot_query);
+    $bot_result = mysqli_stmt_get_result($bot_query);
+    $bot = mysqli_fetch_assoc($bot_result);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -76,9 +87,12 @@
         }
         // select product details
         $product_id = $edit['product_id'];
-        $select_product = "SELECT * FROM products WHERE id = $product_id";
-        $query_product = mysqli_query($connection, $select_product);
-        $product = mysqli_fetch_assoc($query_product);
+        $select_product = "SELECT * FROM products WHERE id = ?";
+        $query_product = mysqli_prepare($connection, $select_product);
+        mysqli_stmt_bind_param($query_product, "i", $product_id);
+        mysqli_stmt_execute($query_product);
+        $product = mysqli_stmt_get_result($query_product);
+        $product = mysqli_fetch_assoc($product);
     ?>
     <?php if ($transaction['failed_count'] >= 5 || $bot['attempt'] >= 3): ?>
         <?php
@@ -92,12 +106,12 @@
         ?>
     <?php else : ?>
     <section class="form">
-        <div>Total checkout price is $<?= number_format($total_price, 2) ?></div>
+        <div>Total checkout price is $<?= htmlspecialchars(number_format($total_price, 2), ENT_QUOTES, 'UTF-8') ?></div>
         <form action="<?= root_url ?>admin/payment_logic.php" method="post" enctype="multipart/form-data">
-            <input type="hidden" name="id" value="<?= $edit['id'] ?>">
-            <input type="hidden" name="product_id" value="<?= $product['id'] ?>">
-            <input type="hidden" name="product_name" value="<?= $product['product'] ?>">
-            <input type="hidden" name="total" value="<?= $total_price ?>">
+            <input type="hidden" name="id" value="<?= htmlspecialchars($edit['id'], ENT_QUOTES, 'UTF-8') ?>">
+            <input type="hidden" name="product_id" value="<?= htmlspecialchars($product['id'], ENT_QUOTES, 'UTF-8') ?>">
+            <input type="hidden" name="product_name" value="<?= htmlspecialchars($product['product'], ENT_QUOTES, 'UTF-8') ?>">
+            <input type="hidden" name="total" value="<?= htmlspecialchars($total_price, ENT_QUOTES, 'UTF-8') ?>">
             <input type="file" name="avatar">
             <button type="submit" name="submit">Submit</button>
         </form>
