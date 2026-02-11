@@ -8,9 +8,12 @@
     }
     // get id from url
     if (isset($_GET['id'])) {
-        $id = filter_var($_GET['id'], FILTER_SANITIZE_NUMBER_INT);
-        $edit_search = "SELECT * FROM user WHERE id=$id";
-        $result = mysqli_query($connection, $edit_search);
+        $id = (int) $_GET['id'];
+        $edit_search = "SELECT * FROM user WHERE id=?";
+        $stmt = mysqli_prepare($connection, $edit_search);
+        mysqli_stmt_bind_param($stmt, "i", $id);
+        mysqli_stmt_execute($stmt);
+        $result = mysqli_stmt_get_result($stmt);
         $edit = mysqli_fetch_assoc($result);
     }
 ?>
@@ -34,7 +37,7 @@
         <section class="form">
         <form action="edit_details_logic.php" method="post">
             <h1>Edit Details</h1>
-            <input type="hidden" name="id" value="<?= $edit['id'] ?>">
+            <input type="hidden" name="id" value="<?= htmlspecialchars($edit['id'], ENT_QUOTES, 'UTF-8') ?>">
             <input type="text" name="fname" placeholder="First name">
             <input type="text" name="lname" placeholder="Last name">
             <input type="text" name="username" placeholder="Username">

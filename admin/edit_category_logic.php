@@ -4,9 +4,9 @@
     include "./configuration/database.php";
     if (isset($_POST['submit'])) {
         // declare variables
-        $id = filter_var($_POST['id'], FILTER_SANITIZE_NUMBER_INT);
-        $description = filter_var($_POST['description'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-        $title = filter_var($_POST['title'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        $id = (int) $_POST['id'];
+        $description = (int) $_POST['description'];
+        $title = (int) $_POST['title'];
         // validating inputs
         if (!$description || !$title) {
             $_SESSION['edit_category'] = "Fill in all inputs!";
@@ -15,8 +15,10 @@
             header("location: " . root_url . "admin/edit_category.php?id=" . $id);
             die();
         } else {
-            $update = "UPDATE category SET title='$title', description='$description' WHERE id=$id";
-            $query = mysqli_query($connection, $update);
+            $update = "UPDATE category SET title=?, description=? WHERE id=?";
+            $query = mysqli_prepare($connection, $update);
+            mysqli_stmt_bind_param($query, "ssi", $title, $description, $id);
+            mysqli_stmt_execute($query);
             if (!mysqli_errno($connection)) {
                 $_SESSION['edit_category_success'] = "Category successfully updated!!";
                 header("location: " . root_url . "admin/manage_category.php");

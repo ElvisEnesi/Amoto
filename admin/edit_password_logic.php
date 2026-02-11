@@ -5,32 +5,44 @@
     // logic
     if (isset($_POST['submit'])) {
         // declare variables
-        $id = filter_var($_POST['id'], FILTER_SANITIZE_NUMBER_INT);
-        $realPassword = filter_var($_POST['password'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-        $current = filter_var($_POST['current'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-        $create = filter_var($_POST['create'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-        $confirm = filter_var($_POST['confirm'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        $id = (int) $_POST['id'];
+        $current = (string) $_POST['current'];
+        $create = (string) $_POST['create'];
+        $confirm = (string) $_POST['confirm'];
         // validate inputs
         if (!$confirm || !$create || !$current) {
             $_SESSION['edit_password'] = "Fill in all inputs!!";
         } else {
-            if ($current !== $realPassword) {
-                $_SESSION['edit_password'] = "Incorrect current password!!";
+            // get password from database
+            $get_user = mysqli_prepare($connection, "SELECT * FROM user WHERE id=?");
+            mysqli_stmt_bind_param($get_user, "i", $id);
+            mysqli_stmt_execute($get_user);
+            $results = mysqli_stmt_get_result($get_user);
+            if (mysqli_num_rows($results) == 0) {
+                $_SESSION['edit_password'] = "User not found!!";
             } else {
-                if ($confirm == $create) {
-                    $new_hased = password_hash($create, PASSWORD_DEFAULT);
+                $gotten_result = mysqli_fetch_assoc($results);
+                $realPassword = $gotten_result['password'];
+                if ($current !== $realPassword) {
+                    $_SESSION['edit_password'] = "Incorrect current password!!";
                 } else {
-                    $_SESSION['edit_password'] = "Create & Confirm passwords do not match!!";
-                }   
-            } 
+                    if ($confirm == $create) {
+                        $new_hased = password_hash($create, PASSWORD_DEFAULT);
+                    } else {
+                        $_SESSION['edit_password'] = "Create & Confirm passwords do not match!!";
+                    }   
+                } 
+            }
         }
         // redirect back if there's any error
         if (isset($_SESSION['edit_password'])) {
-            header("location: " . root_url . "admin/edit_password.php?id-" . $id);
+            header("location: " . root_url . "admin/edit_password.php?id=" . $id);
             die();
         } else {
-            $update = "UPDATE user SET password='$new_hased' WHERE id=$id";
-            $query = mysqli_query($connection, $update);
+            $update = "UPDATE user SET password=? WHERE id=?";
+            $query = mysqli_prepare($connection, $update);
+            mysqli_stmt_bind_param($query, "si", $new_hased, $id);
+            mysqli_stmt_execute($query);
             if (!mysqli_errno($connection)) {
                 $_SESSION['edit_password_success'] = "Your password have been updated!!";
                 header("location: " . root_url . "admin/dashboard.php");

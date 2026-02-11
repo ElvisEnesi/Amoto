@@ -4,8 +4,8 @@
     include "./configuration/database.php";
     if (isset($_POST['submit'])) {
         // declare variables
-        $id = filter_var($_POST['id'], FILTER_SANITIZE_NUMBER_INT);
-        $category = filter_var($_POST['category'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        $id = (int) $_POST['id'];
+        $category = (string) $_POST['category'];
         // validating inputs
         if (!$category) {
             $_SESSION['edit_customer'] = "Select an option!!";
@@ -14,8 +14,10 @@
             header("location: " . root_url . "admin/edit_customer.php?id=" . $id);
             die();
         } else {
-            $update = "UPDATE user SET fraud_status='$category' WHERE id=$id";
-            $query = mysqli_query($connection, $update);
+            $update = "UPDATE user SET fraud_status=? WHERE id=?";
+            $query = mysqli_prepare($connection, $update);
+            mysqli_stmt_bind_param($query, "si", $category, $id);
+            mysqli_stmt_execute($query);
             if (!mysqli_errno($connection)) {
                 $_SESSION['edit_customer_success'] = "Status successfully updated!!";
                 header("location: " . root_url . "admin/customers.php");

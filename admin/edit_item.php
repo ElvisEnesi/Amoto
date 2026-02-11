@@ -8,9 +8,12 @@
     }
     // get id from url
     if (isset($_GET['id'])) {
-        $id = filter_var($_GET['id'], FILTER_SANITIZE_NUMBER_INT);
-        $edit_search = "SELECT * FROM products WHERE id=$id";
-        $result = mysqli_query($connection, $edit_search);
+        $id = (int) $_GET['id'];
+        $edit_search = "SELECT * FROM products WHERE id=?";
+        $stmt = mysqli_prepare($connection, $edit_search);
+        mysqli_stmt_bind_param($stmt, "i", $id);
+        mysqli_stmt_execute($stmt);
+        $result = mysqli_stmt_get_result($stmt);
         $edit = mysqli_fetch_assoc($result);
     }
     // select all categories
@@ -37,13 +40,13 @@
     <section class="form">
         <form action="edit_item_logic.php" method="post" enctype="multipart/form-data">
             <h1>Edit Item</h1>
-            <input type="hidden" name="id" value="<?= $edit['id'] ?>">
-            <input type="hidden" name="previous_image" value="<?= $edit['picture'] ?>">
-            <input type="text" name="title" value="<?= $edit['product'] ?>">
-            <input type="number" name="price" value="<?= $edit['price'] ?>">
+            <input type="hidden" name="id" value="<?= htmlspecialchars($edit['id'], ENT_QUOTES, 'UTF-8') ?>">
+            <input type="hidden" name="previous_image" value="<?= htmlspecialchars($edit['picture'], ENT_QUOTES, 'UTF-8') ?>">
+            <input type="text" name="title" value="<?= htmlspecialchars($edit['product'], ENT_QUOTES, 'UTF-8') ?>">
+            <input type="number" name="price" value="<?= htmlspecialchars($edit['price'], ENT_QUOTES, 'UTF-8') ?>">
             <select name="category">
                 <?php while ($category = mysqli_fetch_assoc($query_category)) : ?>
-                <option value="<?= $category['id'] ?>"><?= $category['title'] ?></option>
+                <option value="<?= htmlspecialchars($category['id'], ENT_QUOTES, 'UTF-8') ?>" <?= $category['id'] == $edit['category_id'] ? "selected" : "" ?>><?= htmlspecialchars($category['title'], ENT_QUOTES, 'UTF-8') ?></option>
                 <?php endwhile ?>
             </select>
             <input type="file" name="avatar">
