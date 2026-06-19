@@ -1,5 +1,6 @@
     <?php
         // include database connection
+        include "./configuration/constant.php";
         include "./configuration/database.php";
         // ip address function
         function get_ip_address() {

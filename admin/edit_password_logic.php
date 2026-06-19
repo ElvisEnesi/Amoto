@@ -51,7 +51,7 @@
             } else {
                 $gotten_result = mysqli_fetch_assoc($results);
                 $realPassword = $gotten_result['password'];
-                if ($current !== $realPassword) {
+                if (password_verify($current, $realPassword) == false) {
                     $_SESSION['edit_password'] = "Incorrect current password!!";
                 } else {
                     if ($confirm == $create) {

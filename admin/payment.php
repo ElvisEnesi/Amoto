@@ -81,7 +81,7 @@
         mysqli_stmt_execute($join_query);
         $join_result = mysqli_stmt_get_result($join_query);
         if ($join_query && $gotten = mysqli_fetch_assoc($join_result)) {
-            $total_price = $gotten['price'] * $gotten['quantity'];
+            $total_price = $gotten['price'] * $gotten['quantity'];//
         }
     ?>
     <?php if ($transaction['failed_count'] >= 5 || $bot['attempt'] >= 3): ?>

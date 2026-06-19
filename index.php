@@ -5,10 +5,10 @@
         include "partials/nav.php";
     ?>
     <section class="banner">
-        <img src="./images/1766527607Shirt.jpg" alt="banner">
+        <img src="<?= root_url ?>../images/1766527607Shirt.jpg" alt="banner">
         <div class="banner_info">
             <h1>CUE THE COLOR</h1>
-            <button onclick="window.location.href='shop.php'">Shop with us</button>
+            <button onclick="window.location.href='<?= root_url ?>shop.php'">Shop with us</button>
         </div>
     </section>
     <h2>BEST SELLERS</h2>
@@ -21,7 +21,7 @@
         <?php while ($product = mysqli_fetch_assoc($query_products)) : ?>
         <div class="card">
             <div class="card_img">
-                <img src="./images/items/<?= htmlspecialchars($product['picture'], ENT_QUOTES, 'UTF-8') ?>" onclick="window.location.href='<?= root_url ?>single.php?id=<?= htmlspecialchars($product['id'], ENT_QUOTES, 'UTF-8') ?>'">
+                <img src="<?= root_url ?>../images/items/<?= htmlspecialchars($product['picture'], ENT_QUOTES, 'UTF-8') ?>" onclick="window.location.href='<?= root_url ?>single.php?id=<?= htmlspecialchars($product['id'], ENT_QUOTES, 'UTF-8') ?>'">
                 <div class="card_featured">Best seller</div>
             </div>
             <p><?= htmlspecialchars($product['product'], ENT_QUOTES, 'UTF-8') ?></p>
@@ -35,7 +35,7 @@
     </div>
     <?php endif ?>
     <section id="btn_section">
-        <button onclick="window.location.href='shop.php'" class="btn">Shop With Us</button>
+        <button onclick="window.location.href='<?= root_url ?>shop.php'" class="btn">Shop With Us</button>
     </section>
     <section class="enquiry">
         <h3>Campus Delivery</h3>

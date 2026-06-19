@@ -34,8 +34,8 @@
     // update logic
     if (isset($_POST['submit'])) {
         // declare variables
-        $description = (int) $_POST['description'];
-        $title = (int) $_POST['title'];
+        $description = (string) $_POST['description'];
+        $title = (string) $_POST['title'];
         // validating inputs
         if (!$description || !$title) {
             $_SESSION['edit_category'] = "Fill in all inputs!";

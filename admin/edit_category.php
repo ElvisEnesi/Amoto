@@ -29,6 +29,8 @@
         mysqli_stmt_execute($stmt);
         $result = mysqli_stmt_get_result($stmt);
         $edit = mysqli_fetch_assoc($result);
+        mysqli_stmt_free_result($stmt);
+        mysqli_stmt_close($stmt);
     } else {
         // insert into unauthorized
         $unauthorized = mysqli_prepare($connection, "INSERT INTO unauthorized (ip_address) VALUES(?)");

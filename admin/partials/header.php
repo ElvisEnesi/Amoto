@@ -32,7 +32,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shoppy</title>
-    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="<?= root_url ?>../css/style.css">
 </head>
 <body>
     <section class="header">
@@ -51,10 +51,10 @@
         </div>
         <div>
             <?php if (isset($_SESSION['user_id'])) : ?>
-            <a href="dashboard.php"><img src="../images/users/<?php echo htmlspecialchars($user['picture'], ENT_QUOTES, 'UTF-8'); ?>"></a>
+            <a href="dashboard.php"><img src="<?= root_url ?>../images/users/<?php echo htmlspecialchars($user['picture'], ENT_QUOTES, 'UTF-8'); ?>"></a>
             <a href="cart.php"><ion-icon name="cart-outline"></ion-icon>(<?= htmlspecialchars($total_active_carts, ENT_QUOTES, 'UTF-8') ?>)</a>
             <?php else : ?>
-            <a href="<?php echo root_url ?>login.php">Log in</a>
+            <a href="<?= root_url ?>login.php">Log in</a>
             <?php endif ?>
         </div>
     </section>

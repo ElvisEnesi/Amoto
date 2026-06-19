@@ -57,7 +57,7 @@
             $avatar_tmp_name = $avatar['tmp_name'];
             $avatar_destination = "../images/items/" . $avatar_name;
             // make sure file is an image
-            $allowed_images = ['png', 'jpg', 'jpeg'];
+            $allowed_images = ['image/png', 'image/jpeg', 'image/jpg'];
             $finfo = finfo_open(FILEINFO_MIME_TYPE);
             $mime_type = finfo_file($finfo, $avatar_tmp_name);
             if (in_array($mime_type, $allowed_images)) {
