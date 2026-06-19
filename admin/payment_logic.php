@@ -33,7 +33,8 @@
         header("location: " . root_url . "kick_you_out.php");
     }
     // join tables
-    $join = "SELECT p.id AS product_id, p.product AS title, p.price AS price, c.id AS cart_id c.quantity AS quantity, c.product_id AS cart_product_id FROM cart c 
+    $join = "SELECT p.id AS product_id, p.product AS title, p.price AS price, c.id AS cart_id, c.quantity AS quantity, 
+    c.product_id AS cart_product_id FROM cart c 
     INNER JOIN products p ON c.product_id = p.id WHERE c.status = ? AND c.customer_id = ?";
     $join_query= mysqli_prepare($connection, $join);
     $status = "active";
